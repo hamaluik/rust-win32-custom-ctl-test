@@ -17,7 +17,7 @@ enum ButtonState {
     Active,
 }
 
-static mut HWND_CLOSE_BUTTON: HWND = null_mut();
+static BUTTON_CLASS_NAME: &str = "_custom_button_";
 
 fn paint_button(hwnd: HWND, state: &ButtonState) {
     let mut ps: PAINTSTRUCT = PAINTSTRUCT {
@@ -41,10 +41,11 @@ fn paint_button(hwnd: HWND, state: &ButtonState) {
         });
 
         let old_pen = SelectObject(hdc, PEN_SNOW_0 as HGDIOBJ);
-        MoveToEx(hdc, rect.left + 8, rect.top + 8, null_mut());
-        LineTo(hdc, rect.right - 8, rect.bottom - 8);
-        MoveToEx(hdc, rect.right - 8, rect.top + 8, null_mut());
-        LineTo(hdc, rect.left + 8, rect.bottom - 8);
+        MoveToEx(hdc, rect.left, rect.top, null_mut());
+        LineTo(hdc, rect.right, rect.top);
+        LineTo(hdc, rect.right, rect.bottom);
+        LineTo(hdc, rect.left, rect.bottom);
+        LineTo(hdc, rect.left, rect.top);
         SelectObject(hdc, old_pen);
 
         EndPaint(hwnd, &mut ps);
@@ -145,7 +146,7 @@ extern "system" fn button_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LP
     return unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) };
 }
 
-pub fn register_close_button() {
+pub fn register_button() {
     let btn_class = WNDCLASSEXW {
         cbSize: mem::size_of::<WNDCLASSEXW>() as u32,
         style: CS_HREDRAW | CS_VREDRAW,
@@ -157,36 +158,28 @@ pub fn register_close_button() {
         hCursor: null_mut(),
         hbrBackground: null_mut(),
         lpszMenuName: null_mut(),
-        lpszClassName: crate::util::win32_string("close_button").as_ptr(),
+        lpszClassName: crate::util::win32_string(BUTTON_CLASS_NAME).as_ptr(),
         hIconSm: null_mut(),
     };
     unsafe { RegisterClassExW(&btn_class) };
 }
 
-pub fn unregister_close_button() {
-    unsafe { UnregisterClassW(crate::util::win32_string("close_button").as_ptr(), crate::H_INSTANCE) };
+pub fn unregister_button() {
+    unsafe { UnregisterClassW(crate::util::win32_string(BUTTON_CLASS_NAME).as_ptr(), crate::H_INSTANCE) };
 }
 
-pub fn create_close_button(parent: HWND) {
+pub fn create_button(parent: HWND, text: &str) -> HWND {
     unsafe {
-        HWND_CLOSE_BUTTON = CreateWindowExW(
+        CreateWindowExW(
             0,
-            crate::util::win32_string("close_button").as_ptr(),
-            null_mut(),
+            crate::util::win32_string(BUTTON_CLASS_NAME).as_ptr(),
+            crate::util::win32_string(text).as_ptr(),
             WS_CHILD | WS_VISIBLE,
             0, 0, 0, 0,
             parent,
             null_mut(),
             crate::H_INSTANCE,
             null_mut(),
-        );
-    }
-}
-
-pub fn position_close_button(parent: HWND) {
-    let mut rect = default_rect();
-    unsafe {
-        GetClientRect(parent, &mut rect);
-        SetWindowPos(HWND_CLOSE_BUTTON, HWND_TOP, rect.right - 24, rect.top, 24, 24, SWP_NOZORDER);
+        )
     }
 }

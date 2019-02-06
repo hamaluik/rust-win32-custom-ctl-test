@@ -13,6 +13,8 @@ mod brushes;
 use crate::brushes::*;
 mod close_button;
 use crate::close_button::*;
+mod button;
+use crate::button::*;
 
 static mut H_INSTANCE: HINSTANCE = null_mut();
 
@@ -20,6 +22,13 @@ extern "system" fn window_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LP
     match msg {
         WM_CREATE => {
             create_close_button(hwnd);
+
+            let next = create_button(hwnd, "Next");
+            unsafe {
+                let mut rect = default_rect();
+                GetClientRect(hwnd, &mut rect);
+                SetWindowPos(next, HWND_TOP, rect.right - (8+64), rect.bottom - (8+24), 64, 24, SWP_NOZORDER);
+            }
         },
 
         WM_SIZE => {
@@ -61,7 +70,7 @@ fn main() -> Result<(), Box<std::error::Error>> {
     unsafe {
         H_INSTANCE = GetModuleHandleW(null_mut());
     }
-    register_button_class();
+    register_custom_classes();
 
     load_brushes();
 
@@ -108,6 +117,6 @@ fn main() -> Result<(), Box<std::error::Error>> {
     }
 
     unload_brushes();
-    unregister_button_class();
+    unregister_custom_classes();
     Ok(())
 }
