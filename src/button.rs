@@ -23,6 +23,7 @@ struct ButtonData {
     state: ButtonState,
     font: HFONT,
     custom_font: bool,
+    colour: Aurora,
 }
 
 static BUTTON_CLASS_NAME: &str = "_custom_button_";
@@ -34,7 +35,13 @@ fn custom_paint(hwnd: HWND, hdc: HDC, rect: &mut RECT, _erase: BOOL, data: &Butt
         FillRect(hdc, rect, match data.state {
             ButtonState::Idle => BRUSH_POLAR_0,
             ButtonState::Hover => BRUSH_POLAR_1,
-            ButtonState::Active => BRUSH_AURORA_0,
+            ButtonState::Active => match data.colour {
+                Aurora::Red => BRUSH_AURORA_0,
+                Aurora::Orange => BRUSH_AURORA_1,
+                Aurora::Yellow => BRUSH_AURORA_2,
+                Aurora::Green => BRUSH_AURORA_3,
+                Aurora::Purple => BRUSH_AURORA_4,
+            },
         });
 
         let old_pen = SelectObject(hdc, PEN_SNOW_0 as HGDIOBJ);
@@ -106,7 +113,8 @@ extern "system" fn button_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LP
                 *(new_ptr as *mut ButtonData) = ButtonData {
                     state: ButtonState::Idle,
                     font,
-                    custom_font: false
+                    custom_font: false,
+                    colour: Aurora::Purple
                 };
                 if SetWindowLongPtrW(hwnd, CB_WND_EXTRA, new_ptr as isize) != 0 {
                     return FALSE as isize;
@@ -274,18 +282,27 @@ pub fn unregister_button() {
     unsafe { UnregisterClassW(win32_string(BUTTON_CLASS_NAME).as_ptr(), crate::H_INSTANCE) };
 }
 
-pub fn create_button(parent: HWND, text: &str) -> HWND {
+pub fn create_button(parent: HWND, id: i32, text: &str, colour: Aurora) -> HWND {
     unsafe {
-        CreateWindowExW(
+        let handle = CreateWindowExW(
             0,
             win32_string(BUTTON_CLASS_NAME).as_ptr(),
             win32_string(text).as_ptr(),
             WS_CHILD | WS_VISIBLE,
             0, 0, 0, 0,
             parent,
-            null_mut(),
+            id as HMENU,
             crate::H_INSTANCE,
             null_mut(),
-        )
+        );
+
+        let ptr = GetWindowLongPtrW(handle, CB_WND_EXTRA) as *mut u8;
+        let button_data = ptr as *mut ButtonData;
+        (*button_data).colour = colour;
+        if SetWindowLongPtrW(handle, CB_WND_EXTRA, ptr as isize) == 0 {
+            eprintln!("Failed to set colour of button: {}", GetLastError());
+        }
+
+        handle
     }
 }

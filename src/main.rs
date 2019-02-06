@@ -18,16 +18,23 @@ use crate::button::*;
 
 static mut H_INSTANCE: HINSTANCE = null_mut();
 
+const BTN_NEXT: i32 = 1001;
+const BTN_BACK: i32 = 1002;
+
 extern "system" fn window_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     match msg {
         WM_CREATE => {
             create_close_button(hwnd);
 
-            let next = create_button(hwnd, "Next");
+            let next = create_button(hwnd, BTN_NEXT, "Next", Aurora::Purple);
+            let back = create_button(hwnd, BTN_BACK, "Back", Aurora::Orange);
+
             unsafe {
                 let mut rect = default_rect();
                 GetClientRect(hwnd, &mut rect);
+                
                 SetWindowPos(next, HWND_TOP, rect.right - (8+64), rect.bottom - (8+24), 64, 24, SWP_NOZORDER);
+                SetWindowPos(back, HWND_TOP, rect.right - (8+64+8+64), rect.bottom - (8+24), 64, 24, SWP_NOZORDER);
             }
         },
 
@@ -57,7 +64,15 @@ extern "system" fn window_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LP
             return hit;
         },
 
-        WM_COMMAND => match wparam {
+        WM_COMMAND => match wparam as i32 {
+            BTN_NEXT => {
+                println!("Next ->");
+            },
+
+            BTN_BACK => {
+                println!("<- Back");
+            },
+
             _ => {}
         },
 
