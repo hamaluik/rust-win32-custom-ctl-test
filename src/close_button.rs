@@ -51,7 +51,7 @@ fn paint_button(hwnd: HWND, state: &ButtonState) {
     }
 }
 
-extern "system" fn button_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+extern "system" fn close_button_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     let ptr = unsafe { GetWindowLongPtrW(hwnd, 0) as *mut u8 };
     let button_state = ptr as *mut ButtonState;
 
@@ -149,7 +149,7 @@ pub fn register_close_button() {
     let btn_class = WNDCLASSEXW {
         cbSize: mem::size_of::<WNDCLASSEXW>() as u32,
         style: CS_HREDRAW | CS_VREDRAW,
-        lpfnWndProc: Some(button_proc),
+        lpfnWndProc: Some(close_button_proc),
         cbClsExtra: 0,
         cbWndExtra: mem::size_of::<*const i32>() as i32,
         hInstance: unsafe { crate::H_INSTANCE },

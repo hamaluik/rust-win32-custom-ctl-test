@@ -6,18 +6,22 @@ use winapi::um::wingdi::CreateSolidBrush;
 use std::ptr::null_mut;
 use winapi::shared::windef::{HBRUSH, HPEN, COLORREF};
 
+#[allow(dead_code)]
 pub enum PolarNight {
     P0, P1, P2, P3
 }
 
+#[allow(dead_code)]
 pub enum SnowStorm {
     S0, S1, S2
 }
 
+#[allow(dead_code)]
 pub enum Frost {
     F0, F1, F2, F3
 }
 
+#[allow(dead_code)]
 pub enum Aurora {
     Red, Orange, Yellow, Green, Purple
 }

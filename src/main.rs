@@ -15,6 +15,8 @@ mod close_button;
 use crate::close_button::*;
 mod button;
 use crate::button::*;
+mod progress;
+use crate::progress::*;
 
 static mut H_INSTANCE: HINSTANCE = null_mut();
 
@@ -28,6 +30,7 @@ extern "system" fn window_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LP
 
             let next = create_button(hwnd, BTN_NEXT, "Next", Aurora::Purple);
             let back = create_button(hwnd, BTN_BACK, "Back", Aurora::Orange);
+            let progress = create_progress(hwnd, 0.25);
 
             unsafe {
                 let mut rect = default_rect();
@@ -35,6 +38,7 @@ extern "system" fn window_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LP
                 
                 SetWindowPos(next, HWND_TOP, rect.right - (8+64), rect.bottom - (8+24), 64, 24, SWP_NOZORDER);
                 SetWindowPos(back, HWND_TOP, rect.right - (8+64+8+64), rect.bottom - (8+24), 64, 24, SWP_NOZORDER);
+                SetWindowPos(progress, HWND_TOP, rect.left + 8, rect.bottom - (24), rect.right - rect.left - (8+64+8+64+8+8), 8, SWP_NOZORDER);
             }
         },
 

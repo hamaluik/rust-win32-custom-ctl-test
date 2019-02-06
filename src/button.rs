@@ -211,19 +211,16 @@ extern "system" fn button_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LP
                 ButtonState::Idle
             };
             InvalidateRect(hwnd, &rect, FALSE);
-            //return 0;
         },
 
         WM_MOUSELEAVE => unsafe {
             (*button_data).state = ButtonState::Idle;
             InvalidateRect(hwnd, null_mut(), FALSE);
-            //return 0;
         },
 
         WM_LBUTTONDOWN => unsafe {
             (*button_data).state = ButtonState::Active;
             InvalidateRect(hwnd, null_mut(), FALSE);
-            //return 0;
         },
 
         WM_LBUTTONUP => unsafe {
@@ -231,15 +228,9 @@ extern "system" fn button_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LP
             let mut rect = default_rect();
             GetClientRect(hwnd, &mut rect);
 
-            //if let ButtonState::Active = *button_state {
-            //    let parent = GetParent(hwnd);
-            //    PostMessageW(parent, WM_CLOSE, 0, 0);
-            //}
-
             (*button_data).state = if PtInRect(&rect, pos) != 0 { ButtonState::Hover } else { ButtonState::Idle };
 
             InvalidateRect(hwnd, null_mut(), FALSE);
-            //return 0;
         },
 
         _ => {}

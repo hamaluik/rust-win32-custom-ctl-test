@@ -14,9 +14,11 @@ pub fn default_rect() -> winapi::shared::windef::RECT {
 pub fn register_custom_classes() {
     crate::close_button::register_close_button();
     crate::button::register_button();
+    crate::progress::register_progress();
 }
 
 pub fn unregister_custom_classes() {
     crate::close_button::unregister_close_button();
     crate::button::unregister_button();
+    crate::progress::unregister_progress();
 }
