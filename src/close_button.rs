@@ -42,9 +42,9 @@ fn paint_button(hwnd: HWND, state: &ButtonState) {
 
         let old_pen = SelectObject(hdc, PEN_SNOW_0 as HGDIOBJ);
         MoveToEx(hdc, rect.left + 8, rect.top + 8, null_mut());
-        LineTo(hdc, rect.right - 8, rect.bottom - 8);
+        LineTo(hdc, rect.right - 7, rect.bottom - 7);
         MoveToEx(hdc, rect.right - 8, rect.top + 8, null_mut());
-        LineTo(hdc, rect.left + 8, rect.bottom - 8);
+        LineTo(hdc, rect.left + 7, rect.bottom - 7);
         SelectObject(hdc, old_pen);
 
         EndPaint(hwnd, &mut ps);
